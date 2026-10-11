@@ -64,6 +64,10 @@ public class SpringEndpointScanner {
         Map<Module, SpringServerConfig> moduleConfigs = new HashMap<>();
 
         for (PsiClass controllerClass : controllerClasses) {
+            if (SpringTestFilterUtils.isTestElement(controllerClass, project)) {
+                continue;
+            }
+
             String packageName = extractPackageName(controllerClass);
             String controllerName = controllerClass.getName();
             String sourceFilePath = extractSourceFilePath(controllerClass);
@@ -72,6 +76,9 @@ public class SpringEndpointScanner {
 
             // Determine module and base URL
             Module module = ModuleUtilCore.findModuleForPsiElement(controllerClass);
+            if (module != null && SpringTestFilterUtils.isTestModule(module)) {
+                continue;
+            }
             String moduleName = "Unknown";
             SpringServerConfig serverConfig = projectServerConfig;
             if (module != null) {
@@ -135,13 +142,13 @@ public class SpringEndpointScanner {
 
     private Set<PsiClass> findControllerClasses(Project project) {
         Set<PsiClass> classes = new HashSet<>();
-        GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
+        GlobalSearchScope scope = SpringTestFilterUtils.getProjectProductionScope(project);
         JavaAnnotationIndex index = JavaAnnotationIndex.getInstance();
 
         for (String annotationShortName : List.of("RestController", "Controller")) {
             for (PsiAnnotation anno : index.get(annotationShortName, project, scope)) {
                 PsiClass psiClass = getContainingClass(anno);
-                if (psiClass != null && SpringAnnotationUtils.isControllerClass(psiClass)) {
+                if (psiClass != null && SpringAnnotationUtils.isControllerClass(psiClass) && !SpringTestFilterUtils.isTestElement(psiClass, project)) {
                     classes.add(psiClass);
                 }
             }
@@ -150,7 +157,7 @@ public class SpringEndpointScanner {
         // Bắt meta-annotations có chứa @RequestMapping
         for (PsiAnnotation anno : index.get("RequestMapping", project, scope)) {
             PsiClass psiClass = getContainingClass(anno);
-            if (psiClass != null && SpringAnnotationUtils.isControllerClass(psiClass)) {
+            if (psiClass != null && SpringAnnotationUtils.isControllerClass(psiClass) && !SpringTestFilterUtils.isTestElement(psiClass, project)) {
                 classes.add(psiClass);
             }
         }

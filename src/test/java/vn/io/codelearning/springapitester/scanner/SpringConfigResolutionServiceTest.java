@@ -72,6 +72,17 @@ public class SpringConfigResolutionServiceTest {
     }
 
     @Test
+    public void testExcludeTestConfigFiles() {
+        com.intellij.openapi.vfs.VirtualFile mockTestResourceFile = new MockVirtualFile("/workspace/my-app/src/test/resources/application.yml");
+        com.intellij.openapi.vfs.VirtualFile mockTestJavaFile = new MockVirtualFile("/workspace/my-app/src/test/java/demo/application.properties");
+        com.intellij.openapi.vfs.VirtualFile mockMainResourceFile = new MockVirtualFile("/workspace/my-app/src/main/resources/application.yml");
+
+        Assert.assertTrue(SpringConfigResolutionService.isTestConfigFile(mockTestResourceFile, null));
+        Assert.assertTrue(SpringConfigResolutionService.isTestConfigFile(mockTestJavaFile, null));
+        Assert.assertFalse(SpringConfigResolutionService.isTestConfigFile(mockMainResourceFile, null));
+    }
+
+    @Test
     public void testServerConfigDiagnosticsAndFallbackStatus() {
         SpringServerConfig config = new SpringServerConfig();
         Assert.assertTrue(config.isFallback());

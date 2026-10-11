@@ -24,13 +24,11 @@ final class SpringApplicationProfileReader {
     }
 
     static Map<String, String> readDefaultProfiles(Project project, @Nullable Module module) {
-        GlobalSearchScope scope = module != null
-                ? GlobalSearchScope.moduleScope(module)
-                : GlobalSearchScope.projectScope(project);
+        GlobalSearchScope scope = SpringTestFilterUtils.getModuleProductionScope(module, project);
         Map<String, String> profiles = new LinkedHashMap<>();
         for (PsiAnnotation annotation : JavaAnnotationIndex.getInstance().get("SpringBootApplication", project, scope)) {
             PsiClass applicationClass = PsiTreeUtil.getParentOfType(annotation, PsiClass.class);
-            if (applicationClass == null) continue;
+            if (applicationClass == null || SpringTestFilterUtils.isTestElement(applicationClass, project)) continue;
             for (PsiMethod mainMethod : applicationClass.findMethodsByName("main", false)) {
                 for (PsiMethodCallExpression call : PsiTreeUtil.findChildrenOfType(mainMethod, PsiMethodCallExpression.class)) {
                     if (isSpringApplicationDefaultPropertiesCall(call)) {

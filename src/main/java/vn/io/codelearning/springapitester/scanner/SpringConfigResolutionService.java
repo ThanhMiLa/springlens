@@ -66,8 +66,10 @@ public class SpringConfigResolutionService implements Disposable {
             for (VFileEvent event : events) {
                 VirtualFile file = event.getFile();
                 if (file != null && (isConfigFile(file.getName()) || "java".equals(file.getExtension()))) {
-                    hasConfigChange = true;
-                    break;
+                    if (!isTestConfigFile(file, project)) {
+                        hasConfigChange = true;
+                        break;
+                    }
                 }
             }
             if (hasConfigChange) {
@@ -515,16 +517,17 @@ public class SpringConfigResolutionService implements Disposable {
     }
 
     private List<VirtualFile> findAndSortConfigFiles(@Nullable Module module) {
-        GlobalSearchScope scope = module != null
-                ? GlobalSearchScope.moduleRuntimeScope(module, false)
-                : GlobalSearchScope.projectScope(project);
+        if (module != null && SpringTestFilterUtils.isTestModule(module)) {
+            return Collections.emptyList();
+        }
+        GlobalSearchScope scope = SpringTestFilterUtils.getModuleProductionScope(module, project);
 
         List<VirtualFile> result = new ArrayList<>();
         String[] extensions = {"properties", "yml", "yaml"};
         for (String ext : extensions) {
             Collection<VirtualFile> files = FilenameIndex.getAllFilesByExt(project, ext, scope);
             for (VirtualFile file : files) {
-                if (file.isValid() && !file.isDirectory() && !isGeneratedOrBuildFile(file)) {
+                if (file.isValid() && !file.isDirectory() && !isGeneratedOrBuildFile(file) && !isTestConfigFile(file, project)) {
                     String name = file.getName().toLowerCase(Locale.ROOT);
                     if (name.startsWith("application") || name.startsWith("bootstrap")) {
                         result.add(file);
@@ -557,6 +560,10 @@ public class SpringConfigResolutionService implements Disposable {
                 || path.contains("/out/")
                 || path.contains("/.idea/")
                 || path.contains("/node_modules/");
+    }
+
+    public static boolean isTestConfigFile(VirtualFile file, @Nullable Project project) {
+        return SpringTestFilterUtils.isTestFile(file, project);
     }
 
     public static void mergeRoute(List<GatewayRouteModel> routes, GatewayRouteModel newRoute) {
@@ -598,12 +605,13 @@ public class SpringConfigResolutionService implements Disposable {
 
     private VirtualFile findConfigFileByName(String filename, @Nullable Module module) {
         if (filename == null || filename.isBlank()) return null;
-        GlobalSearchScope scope = module != null
-                ? GlobalSearchScope.moduleRuntimeScope(module, false)
-                : GlobalSearchScope.projectScope(project);
+        if (module != null && SpringTestFilterUtils.isTestModule(module)) {
+            return null;
+        }
+        GlobalSearchScope scope = SpringTestFilterUtils.getModuleProductionScope(module, project);
         Collection<VirtualFile> files = FilenameIndex.getVirtualFilesByName(project, filename, scope);
         for (VirtualFile file : files) {
-            if (file.isValid() && !file.isDirectory() && !isGeneratedOrBuildFile(file)) {
+            if (file.isValid() && !file.isDirectory() && !isGeneratedOrBuildFile(file) && !isTestConfigFile(file, project)) {
                 return file;
             }
         }

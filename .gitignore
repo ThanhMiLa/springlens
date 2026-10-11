@@ -6,6 +6,7 @@
 *.iws
 *.ipr
 out/
+bin/
 
 # ==========================================
 # Gradle & Build Artifacts

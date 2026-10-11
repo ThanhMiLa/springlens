@@ -21,10 +21,14 @@ public class SecurityConfigScanner {
         Set<PsiElement> processedCalls = new HashSet<>();
 
         String[] searchWords = {"permitAll", "anonymous", "ignoring"};
+        GlobalSearchScope scope = SpringTestFilterUtils.getProjectProductionScope(project);
         
         for (String word : searchWords) {
             PsiSearchHelper.getInstance(project).processElementsWithWord(
                 (element, offsetInElement) -> {
+                    if (SpringTestFilterUtils.isTestElement(element, project)) {
+                        return true;
+                    }
                     if (element instanceof PsiIdentifier && element.getParent() instanceof PsiReferenceExpression) {
                         PsiReferenceExpression refExpr = (PsiReferenceExpression) element.getParent();
                         if (refExpr.getParent() instanceof PsiMethodCallExpression) {
@@ -36,7 +40,7 @@ public class SecurityConfigScanner {
                     }
                     return true;
                 },
-                GlobalSearchScope.projectScope(project),
+                scope,
                 word,
                 UsageSearchContext.IN_CODE,
                 true
