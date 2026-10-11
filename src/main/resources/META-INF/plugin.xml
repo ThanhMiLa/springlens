@@ -2,7 +2,7 @@
 <idea-plugin>
     <id>com.github.thanhmila.plugin.springlens</id>
     <name>SpringLens - Spring Boot RESTful API Tester</name>
-    <version>1.2.4</version>
+    <version>1.2.5</version>
     <vendor email="vntvlogs@gmail.com" url="https://github.com/ThanhMiLa/SpringLens">ThanhMiLa</vendor>
 
     <description><![CDATA[
@@ -39,6 +39,12 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <h3>1.2.5 — Exclude Test Sources &amp; Mock Endpoints</h3>
+        <ul>
+            <li><b>Test Source Exclusion:</b> Automatically exclude controllers, mock endpoints, and test configurations located in test directories (<code>src/test/java</code>, <code>src/test/resources</code>, Gradle test modules).</li>
+            <li><b>Test Annotation Filtering:</b> Ignore test slice controllers annotated with <code>@WebMvcTest</code>, <code>@SpringBootTest</code>, or <code>@TestConfiguration</code>.</li>
+            <li><b>Production Scope Scans:</b> Limit security rule scanning and Spring configuration resolution to production sources, preventing test settings from overriding production ports or security rules.</li>
+        </ul>
         <h3>1.2.4 — Application Profiles &amp; Gateway Configuration</h3>
         <ul>
             <li><b>IntelliJ Run Profiles:</b> Read profiles from module-specific Spring Boot and Application run configurations, including saved Spring Boot configurations in sandboxes without IntelliJ's Spring Boot plugin.</li>

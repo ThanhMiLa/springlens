@@ -2,6 +2,11 @@
 
 # SpringLens Changelog
 
+## [1.2.5] - 2026-10-11
+
+### Fixed
+- **Exclude Test Sources and Configurations:** Automatically ignore test controllers, mock endpoints, and test configurations located in test directories (such as `src/test/java`, `src/test/resources`, and Gradle test modules). Endpoints annotated with test slice annotations (e.g. `@WebMvcTest`, `@SpringBootTest`, `@TestConfiguration`) and security rules defined in test code are now excluded from discovery, ensuring only production APIs and configurations are scanned.
+
 ## [1.2.4] - 2026-10-08
 
 ### Fixed
