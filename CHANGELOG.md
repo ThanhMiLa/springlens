@@ -2,6 +2,12 @@
 
 # SpringLens Changelog
 
+## [1.2.6] - 2026-10-13
+
+### Fixed
+- **Preserve Null Fields in Response JSON:** Configure JSON formatter to retain all `null` fields in the response body viewer. Previously, fields with null values returned by APIs were stripped during pretty-printing; all returned fields (including nested objects and array items with null values) are now displayed completely.
+- **Preserve Null Values in Schema Merge:** Ensure smart schema merging retains existing null values without dropping them during serialization.
+
 ## [1.2.5] - 2026-10-11
 
 ### Fixed

@@ -2,7 +2,7 @@
 <idea-plugin>
     <id>com.github.thanhmila.plugin.springlens</id>
     <name>SpringLens - Spring Boot RESTful API Tester</name>
-    <version>1.2.5</version>
+    <version>1.2.6</version>
     <vendor email="vntvlogs@gmail.com" url="https://github.com/ThanhMiLa/SpringLens">ThanhMiLa</vendor>
 
     <description><![CDATA[
@@ -39,6 +39,12 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <h3>1.2.6 — Preserve Null Fields in Response JSON</h3>
+        <ul>
+            <li><b>Preserve Null Fields:</b> Display all response fields even when their values are <code>null</code>, matching behavior with tools like Postman and preventing keys from being hidden during JSON formatting.</li>
+            <li><b>Nested &amp; Array Null Values:</b> Retain null values within nested JSON objects and arrays in response preview.</li>
+            <li><b>Schema Sync Retention:</b> Preserve null values when performing Smart Merge on request body schemas.</li>
+        </ul>
         <h3>1.2.5 — Exclude Test Sources &amp; Mock Endpoints</h3>
         <ul>
             <li><b>Test Source Exclusion:</b> Automatically exclude controllers, mock endpoints, and test configurations located in test directories (<code>src/test/java</code>, <code>src/test/resources</code>, Gradle test modules).</li>
