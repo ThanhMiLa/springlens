@@ -75,4 +75,13 @@ public class SmartMergeUtilTest {
 
         Assert.assertEquals(1, obj.getAsJsonArray("tags").size());
     }
+
+    @Test
+    public void testMergePreservesNullValues() {
+        String oldJson = "{\"name\":null,\"age\":28}";
+        String newSchema = "{\"name\":null,\"age\":0}";
+
+        String merged = SmartMergeUtil.mergeJson(oldJson, newSchema);
+        Assert.assertTrue(merged.contains("\"name\": null"));
+    }
 }

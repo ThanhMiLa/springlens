@@ -9,7 +9,10 @@ import java.util.Map;
  */
 public class SmartMergeUtil {
 
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson GSON = new GsonBuilder()
+            .setPrettyPrinting()
+            .serializeNulls()
+            .create();
 
     /**
      * Gộp value từ oldJson vào newSchemaJson.

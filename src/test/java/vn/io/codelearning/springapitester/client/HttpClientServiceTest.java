@@ -132,4 +132,26 @@ public class HttpClientServiceTest {
         ep.setAllowInsecureTls(false);
         Assert.assertNull(ep.getInsecureTlsConsent());
     }
+
+    @Test
+    public void testFormatJsonPreservesNullFields() {
+        HttpClientService service = new HttpClientService();
+        String inputJson = "{\"id\":1,\"name\":null,\"active\":true,\"metadata\":null}";
+        String formatted = service.formatJson(inputJson);
+
+        Assert.assertTrue(formatted.contains("\"name\": null"));
+        Assert.assertTrue(formatted.contains("\"metadata\": null"));
+        Assert.assertTrue(formatted.contains("\"id\": 1"));
+        Assert.assertTrue(formatted.contains("\"active\": true"));
+    }
+
+    @Test
+    public void testFormatJsonPreservesNullInNestedObjectsAndArrays() {
+        HttpClientService service = new HttpClientService();
+        String inputJson = "{\"nested\":{\"field\":null},\"list\":[null,1]}";
+        String formatted = service.formatJson(inputJson);
+
+        Assert.assertTrue(formatted.contains("\"field\": null"));
+        Assert.assertTrue(formatted.contains("null"));
+    }
 }

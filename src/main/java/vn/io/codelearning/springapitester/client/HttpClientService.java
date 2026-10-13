@@ -46,7 +46,10 @@ public class HttpClientService implements Disposable {
                 .writeTimeout(30, TimeUnit.SECONDS)
                 .retryOnConnectionFailure(true)
                 .build();
-        this.gson = new GsonBuilder().setPrettyPrinting().create();
+        this.gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .serializeNulls()
+                .create();
     }
 
     public static HttpClientService getInstance(@NotNull Project project) {
@@ -243,7 +246,7 @@ public class HttpClientService implements Disposable {
     /**
      * Hỗ trợ format chuỗi JSON cho đẹp. Nếu không phải JSON thì trả về nguyên bản.
      */
-    private String formatJson(String rawJson) {
+    String formatJson(String rawJson) {
         if (rawJson == null || rawJson.trim().isEmpty()) {
             return rawJson;
         }
