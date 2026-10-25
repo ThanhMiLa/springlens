@@ -35,11 +35,6 @@ SpringLens automatically scans your project to organize all endpoints into an in
 | **Workspace State Persistence** | Preserves all custom headers, parameters, and request bodies per-project across IDE restarts. |
 | **Instant cURL Export** | One-click copy for ready-to-run `curl` commands for terminal testing and team collaboration. |
 
-Profile detection also reads constant `spring.profiles.active` and `spring.profiles.default` values passed directly through `SpringApplication.setDefaultProperties(Map.of(...))` in a Java `@SpringBootApplication` main method. File configuration takes precedence for the same property; dynamically computed Java configuration is not evaluated.
-
-For IntelliJ Spring Boot and Application run configurations, profile detection reads the Active profiles field, explicit profile environment variables, VM options, and program arguments. The selected configuration is used for its module; other modules use their sole matching configuration. If a module has multiple configurations, select the desired one and click **Reload**. Saved Spring Boot configurations can also be read in a sandbox where IntelliJ's Spring Boot plugin is unavailable.
-
-
 ## Screenshots
 
 ### 1. IDE Integration & Workspace Overview
