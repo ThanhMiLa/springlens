@@ -1,8 +1,10 @@
 package vn.io.codelearning.springapitester.ui;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.treeStructure.Tree;
+import com.intellij.util.ui.JBUI;
 import vn.io.codelearning.springapitester.model.EndpointModel;
 import vn.io.codelearning.springapitester.util.GatewayConfigReader.GatewayConfig;
 import vn.io.codelearning.springapitester.util.GatewayEndpointResolver;
@@ -27,7 +29,6 @@ public class EndpointTreePanel extends JPanel {
     private final Tree tree;
     private final DefaultTreeModel treeModel;
     private final DefaultMutableTreeNode rootNode;
-    private final JButton reloadBtn;
     private final com.intellij.openapi.ui.ComboBox<SourceFileFilterOption> sourceFileComboBox;
 
     private List<EndpointModel> currentEndpoints = Collections.emptyList();
@@ -40,6 +41,16 @@ public class EndpointTreePanel extends JPanel {
     private GatewayConfig gatewayConfig = new GatewayConfig();
     private EndpointModel selectedEndpoint;
 
+    private static JButton createToolbarButton(Icon icon, String description) {
+        JButton button = new JButton(icon);
+        button.setMargin(JBUI.insets(2, 6));
+        int buttonSize = Math.max(JBUI.scale(28), button.getPreferredSize().height);
+        button.setPreferredSize(new Dimension(buttonSize, buttonSize));
+        button.setToolTipText(description);
+        button.getAccessibleContext().setAccessibleName(description);
+        return button;
+    }
+
     public EndpointTreePanel(Project project, Consumer<EndpointModel> onEndpointSelected, Runnable onReloadClicked) {
         this.project = project;
         this.onEndpointSelected = onEndpointSelected;
@@ -48,18 +59,14 @@ public class EndpointTreePanel extends JPanel {
         setLayout(new BorderLayout());
         setMinimumSize(new Dimension(100, 100));
 
-        // 1. Header: Source File Filter + Actions + Gateway Mode
-        reloadBtn = new JButton("Reload");
+        JButton reloadBtn = createToolbarButton(AllIcons.Actions.Refresh, "Reload APIs");
         reloadBtn.addActionListener(e -> {
             if (this.onReloadClicked != null) {
                 this.onReloadClicked.run();
             }
         });
 
-        JPanel actionPanel = new JPanel(new GridLayout(1, 3, 4, 0));
-
-        JButton addBtn = new JButton("+");
-        addBtn.setToolTipText("New Collection");
+        JButton addBtn = createToolbarButton(AllIcons.Actions.NewFolder, "New Collection");
         addBtn.addActionListener(e -> {
             vn.io.codelearning.springapitester.state.SpringLensState state = vn.io.codelearning.springapitester.state.SpringLensState.getInstance(project);
             if (state != null) {
@@ -67,12 +74,11 @@ public class EndpointTreePanel extends JPanel {
                 updateEndpoints(this.currentEndpoints);
             }
         });
-        JButton clearBtn = new JButton("🗑");
-        clearBtn.setToolTipText("Clear all cached data and collections");
+        JButton clearBtn = createToolbarButton(AllIcons.Actions.GC, "Clear all saved data…");
         clearBtn.addActionListener(e -> {
             int result = com.intellij.openapi.ui.Messages.showYesNoDialog(
                     project,
-                    "Are you sure you want to clear all cached data, including manual collections, request bodies, and responses? This action cannot be undone.",
+                    "Are you sure you want to clear all cached data, including manual collections, request bodies, responses, and cookies? This action cannot be undone.",
                     "Clear All Data",
                     "Clear",
                     "Cancel",
@@ -95,11 +101,8 @@ public class EndpointTreePanel extends JPanel {
             }
         });
         
-        actionPanel.add(addBtn);
-        actionPanel.add(clearBtn);
-        actionPanel.add(reloadBtn);
-        
         sourceFileComboBox = new com.intellij.openapi.ui.ComboBox<>();
+        sourceFileComboBox.getAccessibleContext().setAccessibleName("Filter by source file");
         sourceFileComboBox.addActionListener(e -> {
             if (!updatingSourceFileFilter) {
                 updateEndpoints(currentEndpoints);
@@ -124,13 +127,11 @@ public class EndpointTreePanel extends JPanel {
             }
         });
 
-        JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.add(sourceFileComboBox, BorderLayout.NORTH);
+        JPanel toolbar = new ResponsiveEndpointToolbar(sourceFileComboBox, addBtn, reloadBtn, clearBtn);
 
-        JPanel controlsPanel = new JPanel(new BorderLayout());
-        controlsPanel.add(actionPanel, BorderLayout.NORTH);
-        controlsPanel.add(gatewayComboBox, BorderLayout.SOUTH);
-        headerPanel.add(controlsPanel, BorderLayout.CENTER);
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.add(toolbar, BorderLayout.NORTH);
+        headerPanel.add(gatewayComboBox, BorderLayout.SOUTH);
         add(headerPanel, BorderLayout.NORTH);
 
         // 2. Tree
@@ -452,7 +453,7 @@ public class EndpointTreePanel extends JPanel {
         @Override
         public String toString() {
             if (sourceFilePath == null) {
-                return "All files";
+                return "Files";
             }
             if (sourceFilePath.isEmpty()) {
                 return "(Unknown file)";
@@ -571,7 +572,7 @@ public class EndpointTreePanel extends JPanel {
                         // We need to re-evaluate the auto state. 
                         // An easy way is to trigger a rescan or just repaint and let the scanner handle it on next refresh.
                         // But wait, the model's current state is overridden. Let's just ask user to click Reload.
-                        com.intellij.openapi.ui.Messages.showInfoMessage("Security check reset to Auto. Please click Reload to re-scan.", "Reset Security");
+                        com.intellij.openapi.ui.Messages.showInfoMessage("Security check reset to Auto. Please use Reload APIs to re-scan.", "Reset Security");
                     }
                 }
             });
