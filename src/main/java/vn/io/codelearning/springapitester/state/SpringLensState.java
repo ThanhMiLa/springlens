@@ -67,8 +67,8 @@ public class SpringLensState implements PersistentStateComponent<SpringLensState
             }
         }
         this.gatewayModeEnabled = state.gatewayModeEnabled;
-        this.persistRequestBodies = state.persistRequestBodies;
-        this.persistResponseHistory = state.persistResponseHistory;
+        this.persistRequestBodies = true;
+        this.persistResponseHistory = true;
     }
 
     public String getEndpointKey(vn.io.codelearning.springapitester.model.EndpointModel endpoint) {

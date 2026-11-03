@@ -21,6 +21,7 @@ import vn.io.codelearning.springapitester.model.GatewayEndpointResolution;
 import vn.io.codelearning.springapitester.model.ParameterModel;
 import vn.io.codelearning.springapitester.model.ParamTypeEnum;
 import vn.io.codelearning.springapitester.model.ServerConfigMetadata;
+import vn.io.codelearning.springapitester.state.SpringLensState;
 import vn.io.codelearning.springapitester.util.GatewayConfigReader.GatewayConfig;
 import vn.io.codelearning.springapitester.util.GatewayEndpointResolver;
 
@@ -37,9 +38,6 @@ public class EndpointDetailPanel extends JPanel {
     private final com.intellij.openapi.ui.ComboBox<vn.io.codelearning.springapitester.model.HttpMethodEnum> methodComboBox;
     private final JBTextField urlField;
     private final JButton sendBtn;
-    private final JCheckBox insecureTlsCheckBox;
-    private final JCheckBox persistRequestBodiesCheckBox;
-    private final JCheckBox persistResponseHistoryCheckBox;
 
     private final ParamTablePanel paramPanel;
     private final ParamTablePanel headerParamPanel;
@@ -162,14 +160,6 @@ public class EndpointDetailPanel extends JPanel {
                                 .extractRelativePathAndQuery(urlForPersistence, effectiveBaseUrl);
                         currentEndpoint.setPath(relativePath);
                     }
-                    if (currentEndpoint.getInsecureTlsConsent() != null) {
-                        okhttp3.HttpUrl parsed = okhttp3.HttpUrl.parse(url);
-                        String host = parsed != null ? parsed.host() : "";
-                        if (!currentEndpoint.getInsecureTlsConsent().matchesHost(host)) {
-                            currentEndpoint.revokeInsecureTlsConsent();
-                            insecureTlsCheckBox.setSelected(false);
-                        }
-                    }
                     if (onEndpointUpdated != null) {
                         onEndpointUpdated.run();
                     }
@@ -269,72 +259,12 @@ public class EndpointDetailPanel extends JPanel {
         topBar.add(urlField, BorderLayout.CENTER);
         topBar.add(btnPanel, BorderLayout.EAST);
         
-        JPanel headerPanelWrap = new JPanel(new BorderLayout());
-        headerPanelWrap.add(topBar, BorderLayout.CENTER);
-
-        insecureTlsCheckBox = new JCheckBox("Allow insecure TLS for localhost/loopback only");
-        insecureTlsCheckBox.setToolTipText("Trust self-signed certificates only for local development hosts");
-        insecureTlsCheckBox.addActionListener(e -> {
-            if (isUpdatingUI || currentEndpoint == null) return;
-            if (insecureTlsCheckBox.isSelected()) {
-                String fullUrl = urlField.getText().trim();
-                okhttp3.HttpUrl parsed = okhttp3.HttpUrl.parse(fullUrl);
-                String host = parsed != null ? parsed.host() : "localhost";
-                if (!HttpClientService.isLocalDevelopmentHost(host)) {
-                    com.intellij.openapi.ui.Messages.showErrorDialog(
-                            project,
-                            "Insecure TLS is only allowed for localhost or loopback development hosts.",
-                            "Insecure TLS Prohibited"
-                    );
-                    insecureTlsCheckBox.setSelected(false);
-                    currentEndpoint.revokeInsecureTlsConsent();
-                    return;
-                }
-                int choice = com.intellij.openapi.ui.Messages.showYesNoDialog(
-                        project,
-                        "This disables certificate validation for host '" + host + "' and can expose credentials. Enable it only for a trusted development server.",
-                        "Enable Insecure Local TLS",
-                        "Enable",
-                        "Cancel",
-                        com.intellij.openapi.ui.Messages.getWarningIcon()
-                );
-                if (choice == com.intellij.openapi.ui.Messages.YES) {
-                    currentEndpoint.grantInsecureTlsConsent(host);
-                } else {
-                    insecureTlsCheckBox.setSelected(false);
-                    currentEndpoint.revokeInsecureTlsConsent();
-                }
-            } else {
-                currentEndpoint.revokeInsecureTlsConsent();
-            }
-        });
-        JPanel privacyOptions = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
-        privacyOptions.add(insecureTlsCheckBox);
-        persistRequestBodiesCheckBox = new JCheckBox("Persist request bodies");
-        persistResponseHistoryCheckBox = new JCheckBox("Persist response history");
-        vn.io.codelearning.springapitester.state.SpringLensState privacyState =
-                vn.io.codelearning.springapitester.state.SpringLensState.getInstance(project);
-        if (privacyState != null) {
-            persistRequestBodiesCheckBox.setSelected(privacyState.persistRequestBodies);
-            persistResponseHistoryCheckBox.setSelected(privacyState.persistResponseHistory);
+        SpringLensState persistenceState = SpringLensState.getInstance(project);
+        if (persistenceState != null) {
+            persistenceState.persistRequestBodies = true;
+            persistenceState.persistResponseHistory = true;
         }
-        persistRequestBodiesCheckBox.setToolTipText("Persist request body across IDE restarts (enabled by default)");
-        persistResponseHistoryCheckBox.setToolTipText("Persist response history across IDE restarts (enabled by default)");
-        persistRequestBodiesCheckBox.addActionListener(e -> {
-            vn.io.codelearning.springapitester.state.SpringLensState state =
-                    vn.io.codelearning.springapitester.state.SpringLensState.getInstance(project);
-            if (state != null) state.persistRequestBodies = persistRequestBodiesCheckBox.isSelected();
-        });
-        persistResponseHistoryCheckBox.addActionListener(e -> {
-            vn.io.codelearning.springapitester.state.SpringLensState state =
-                    vn.io.codelearning.springapitester.state.SpringLensState.getInstance(project);
-            if (state != null) state.persistResponseHistory = persistResponseHistoryCheckBox.isSelected();
-        });
-        privacyOptions.add(persistRequestBodiesCheckBox);
-        privacyOptions.add(persistResponseHistoryCheckBox);
-        headerPanelWrap.add(privacyOptions, BorderLayout.SOUTH);
-        
-        add(headerPanelWrap, BorderLayout.NORTH);
+        add(topBar, BorderLayout.NORTH);
 
         // 2. Splitter for Request / Response
         JBSplitter mainSplitter = new JBSplitter(true, 0.5f);
@@ -644,7 +574,6 @@ public class EndpointDetailPanel extends JPanel {
                 headerPanel.setHeaders(new java.util.ArrayList<>());
                 authPanel.setAuthConfig(new vn.io.codelearning.springapitester.model.AuthConfig());
                 authPanel.setSecuredStatus(false);
-                insecureTlsCheckBox.setSelected(false);
                 requestTabs.setSelectedIndex(requestTabIndex(vn.io.codelearning.springapitester.model.RequestTab.PARAMS));
                 ApplicationManager.getApplication().runWriteAction(() -> {
                     requestBodyEditor.getDocument().setText("");
@@ -660,6 +589,7 @@ public class EndpointDetailPanel extends JPanel {
             return;
         }
 
+        endpoint.revokeInsecureTlsConsent();
         isUpdatingUI = true;
         try {
             vn.io.codelearning.springapitester.client.RequestExecutionContext active =
@@ -690,7 +620,6 @@ public class EndpointDetailPanel extends JPanel {
             headerPanel.setHeaders(endpoint.getCustomHeaders());
             authPanel.setAuthConfig(endpoint.getAuthConfig());
             authPanel.setSecuredStatus(endpoint.isSecured());
-            insecureTlsCheckBox.setSelected(endpoint.isAllowInsecureTls());
 
             String json = endpoint.getRequestBodyJson() != null ? endpoint.getRequestBodyJson() : "";
             
@@ -784,7 +713,7 @@ public class EndpointDetailPanel extends JPanel {
         currentEndpoint.setCustomHeaders(headerPanel.getHeaders());
         currentEndpoint.setAuthConfig(authPanel.getAuthConfig());
         currentEndpoint.setRequestBodyJson(requestBodyEditor.getDocument().getText());
-        currentEndpoint.setAllowInsecureTls(insecureTlsCheckBox.isSelected());
+        currentEndpoint.revokeInsecureTlsConsent();
         
         // Tự động lưu trạng thái (State Persistence)
         vn.io.codelearning.springapitester.state.SpringLensState state = vn.io.codelearning.springapitester.state.SpringLensState.getInstance(project);
@@ -905,7 +834,7 @@ public class EndpointDetailPanel extends JPanel {
             try {
                 Request request = HttpRequestBuilder.buildRequest(requestEndpoint, fullUrl);
                 HttpClientService.RequestHandle handle = HttpClientService.getInstance(project)
-                        .execute(request, requestEndpoint.getInsecureTlsConsent());
+                        .execute(request, null);
                 context.setRequestHandle(handle);
                 activeRequests.add(handle);
                 handle.future().whenComplete((response, error) -> {

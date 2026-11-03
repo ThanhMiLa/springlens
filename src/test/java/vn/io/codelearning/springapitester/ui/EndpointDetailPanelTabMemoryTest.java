@@ -18,6 +18,43 @@ import java.lang.reflect.Field;
 
 public class EndpointDetailPanelTabMemoryTest extends BasePlatformTestCase {
 
+    public void testHiddenOptionsEnablePersistenceAndRevokeRestoredTlsConsent() throws Exception {
+        EdtTestUtil.runInEdtAndWait(() -> {
+            SpringLensState state = SpringLensState.getInstance(getProject());
+            state.persistRequestBodies = false;
+            state.persistResponseHistory = false;
+            EndpointDetailPanel panel = new EndpointDetailPanel(getProject());
+            try {
+                assertTrue(state.persistRequestBodies);
+                assertTrue(state.persistResponseHistory);
+                EndpointModel endpoint = manualEndpoint("legacy-tls");
+                endpoint.grantInsecureTlsConsent("localhost");
+                endpoint.setRequestBodyJson("{\"name\":\"Alice\"}");
+                endpoint.setLastResponseBody("{\"id\":1}");
+                endpoint.setLastResponseStatusCode(200);
+                state.saveEndpoint(endpoint);
+                EndpointModel restored = manualEndpoint("legacy-tls");
+                state.restoreEndpoint(restored);
+                assertNotNull(restored.getInsecureTlsConsent());
+
+                panel.displayEndpoint(restored);
+                assertFalse(restored.isAllowInsecureTls());
+                assertNull(restored.getInsecureTlsConsent());
+                panel.displayEndpoint(null);
+
+                EndpointModel reopened = manualEndpoint("legacy-tls");
+                state.restoreEndpoint(reopened);
+                assertFalse(reopened.isAllowInsecureTls());
+                assertNull(reopened.getInsecureTlsConsent());
+                assertEquals("{\"name\":\"Alice\"}", reopened.getRequestBodyJson());
+                assertEquals("{\"id\":1}", reopened.getLastResponseBody());
+            } finally {
+                releaseEditor(panel, "requestBodyEditor");
+                releaseEditor(panel, "responseBodyEditor");
+            }
+        });
+    }
+
     public void testEachEndpointRestoresItsOwnLastRequestTab() throws Exception {
         EdtTestUtil.runInEdtAndWait(() -> {
             EndpointDetailPanel panel = new EndpointDetailPanel(getProject());

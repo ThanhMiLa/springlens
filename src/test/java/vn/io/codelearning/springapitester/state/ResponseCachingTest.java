@@ -140,6 +140,29 @@ public class ResponseCachingTest {
     }
 
     @Test
+    public void testLoadingLegacyDisabledPersistenceEnablesBodiesAndResponseHistory() {
+        SpringLensState legacyState = new SpringLensState();
+        legacyState.persistRequestBodies = false;
+        legacyState.persistResponseHistory = false;
+
+        SpringLensState state = new SpringLensState();
+        state.loadState(legacyState);
+
+        Assert.assertTrue(state.persistRequestBodies);
+        Assert.assertTrue(state.persistResponseHistory);
+        EndpointModel endpoint = new EndpointModel(HttpMethodEnum.POST, "/users", "UserController", "demo", "create");
+        endpoint.setRequestBodyJson("{\"name\":\"Alice\"}");
+        endpoint.setLastResponseBody("{\"id\":1}");
+        endpoint.setLastResponseStatusCode(201);
+        state.saveEndpoint(endpoint);
+
+        EndpointSavedState saved = state.endpoints.get(state.getEndpointKey(endpoint));
+        Assert.assertEquals("{\"name\":\"Alice\"}", saved.requestBodyJson);
+        Assert.assertEquals("{\"id\":1}", saved.lastResponseBody);
+        Assert.assertEquals(1, saved.responseHistory.size());
+    }
+
+    @Test
     public void testSensitiveResponseHeadersArePersistedInHistory() {
         SpringLensState state = new SpringLensState();
         EndpointModel endpoint = new EndpointModel(HttpMethodEnum.GET, "/secure", "SecureController", "com.example", "secure");
