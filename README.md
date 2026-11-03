@@ -31,9 +31,14 @@ SpringLens automatically scans your project to organize all endpoints into an in
 | **Spring Cloud Gateway Ready** | Reads YAML routes under `spring.cloud.gateway.routes` and `spring.cloud.gateway.server.webflux.routes`, honors `spring.profiles.default` when no active profile is configured, computes reverse rewrites (`StripPrefix`, `PrefixPath`, `RewritePath`), and keeps internal endpoints direct-only when no Gateway route exposes them. |
 | **One-Click Bearer Token Sharing** | Set your Bearer JWT Token once and sync it across all project endpoints in a single click with **"Apply to All APIs"**. |
 | **Custom Endpoints & Collections** | Create manual endpoints and custom folders to test external APIs, third-party webhooks, or ad-hoc requests alongside scanned project endpoints. |
-| **Dev-Friendly SSL** | Built-in Trust-All SSL handler for local microservices running on self-signed `https://localhost` certificates without handshake failures. |
-| **Workspace State Persistence** | Preserves all custom headers, parameters, and request bodies per-project across IDE restarts. |
+| **HTTPS Certificate Validation** | Validates HTTPS certificates for all requests, including localhost services. |
+| **Workspace State Persistence** | Automatically preserves custom headers, parameters, request bodies, and response history per-project across IDE restarts. |
 | **Instant cURL Export** | One-click copy for ready-to-run `curl` commands for terminal testing and team collaboration. |
+
+The API tree toolbar provides a **Files** filter, **New Collection**, **Reload APIs**, and a trash button to **Clear all saved data…** after confirmation (including saved collections, requests, responses, and cookies). As the panel narrows, controls on the right progressively move into a **▾** dropdown: first **Reload APIs** and the trash action, then **New Collection**, and finally the **Files** filter. At the narrowest size, a full-width **Action ▾** button contains all four controls; its **Files** submenu preserves the selected source file.
+
+Request bodies and response history are always saved automatically, including for projects that previously disabled persistence. HTTPS certificate validation stays enabled; the request panel has no persistence or insecure TLS checkboxes.
+
 
 ## Screenshots
 
