@@ -2,6 +2,13 @@
 
 # SpringLens Changelog
 
+## [1.2.7] - 2026-11-04
+
+### Changed
+- **Responsive Endpoint Toolbar:** The file filter and collection, reload, and clear actions now share a compact toolbar. As space narrows, actions progressively move into dropdown menus.
+- **Simplified Request Options:** Request bodies and response history are saved automatically; the previous persistence checkboxes have been removed.
+- **HTTPS Validation:** HTTPS certificate validation remains enabled for all requests, including localhost. The insecure TLS option has been removed, and previously saved consent is no longer used when sending requests.
+
 ## [1.2.6] - 2026-10-13
 
 ### Fixed

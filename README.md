@@ -4,7 +4,7 @@
 ### Spring Boot RESTful API Tester for IntelliJ IDEA
 
 [![Build](https://github.com/ThanhMiLa/SpringLens/actions/workflows/build.yml/badge.svg)](https://github.com/ThanhMiLa/SpringLens/actions)
-[![Version](https://img.shields.io/badge/version-1.2.6-blue.svg)](https://github.com/ThanhMiLa/SpringLens/releases)
+[![Version](https://img.shields.io/badge/version-1.2.7-blue.svg)](https://github.com/ThanhMiLa/SpringLens/releases)
 [![License](https://img.shields.io/badge/license-Apache%202.0-green.svg)](./LICENSE)
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.x%20%7C%203.x-6DB33F.svg)](https://spring.io/projects/spring-boot)
@@ -26,19 +26,14 @@ SpringLens automatically scans your project to organize all endpoints into an in
 
 | Feature | Description |
 |---|---|
-| **Deep AST/PSI Endpoint Scanner** | Scans `@RestController`, `@GetMapping`, `@PostMapping`... across all modules with full `@PathVariable` regex and `@RequestPart` Multipart support. |
-| **Instant DTO Schema Sync** | One-click JSON body generator from Java DTO classes with recursive reference protection and smart merge. |
-| **Spring Cloud Gateway Ready** | Reads YAML routes under `spring.cloud.gateway.routes` and `spring.cloud.gateway.server.webflux.routes`, honors `spring.profiles.default` when no active profile is configured, computes reverse rewrites (`StripPrefix`, `PrefixPath`, `RewritePath`), and keeps internal endpoints direct-only when no Gateway route exposes them. |
-| **One-Click Bearer Token Sharing** | Set your Bearer JWT Token once and sync it across all project endpoints in a single click with **"Apply to All APIs"**. |
-| **Custom Endpoints & Collections** | Create manual endpoints and custom folders to test external APIs, third-party webhooks, or ad-hoc requests alongside scanned project endpoints. |
-| **HTTPS Certificate Validation** | Validates HTTPS certificates for all requests, including localhost services. |
-| **Workspace State Persistence** | Automatically preserves custom headers, parameters, request bodies, and response history per-project across IDE restarts. |
-| **Instant cURL Export** | One-click copy for ready-to-run `curl` commands for terminal testing and team collaboration. |
-
-The API tree toolbar provides a **Files** filter, **New Collection**, **Reload APIs**, and a trash button to **Clear all saved data…** after confirmation (including saved collections, requests, responses, and cookies). As the panel narrows, controls on the right progressively move into a **▾** dropdown: first **Reload APIs** and the trash action, then **New Collection**, and finally the **Files** filter. At the narrowest size, a full-width **Action ▾** button contains all four controls; its **Files** submenu preserves the selected source file.
-
-Request bodies and response history are always saved automatically, including for projects that previously disabled persistence. HTTPS certificate validation stays enabled; the request panel has no persistence or insecure TLS checkboxes.
-
+| **Discover Spring APIs from Source** | Find controller endpoints across project modules without importing an API specification. Browse APIs by service and controller, filter by source file, and exclude test controllers automatically. |
+| **Generate & Sync Request JSON** | Generate sample JSON from Java DTOs, then use **Sync Schema** to merge DTO changes into the request body while preserving values you have entered. |
+| **Resolve Spring Service URLs** | Detect module-specific ports, context paths, and profiles from Spring configuration and IntelliJ run configurations, reducing manual URL setup for multi-service projects. |
+| **Test Directly or Through a Gateway** | Switch between direct service calls and Spring Cloud Gateway URLs for routable endpoints. Resolve supported `StripPrefix`, `PrefixPath`, and `RewritePath` rules while keeping internal endpoints direct-only. |
+| **Reuse Authentication Across APIs** | Configure Bearer tokens, Basic Auth, or API keys and apply the configuration to all project APIs with **Apply to All APIs**. |
+| **Send JSON, Forms & Files** | Edit path and query parameters, headers, and cookies; send JSON bodies or multipart form data with file uploads directly from IntelliJ. |
+| **Organize & Resume API Testing** | Add manual requests and collections alongside discovered APIs. Restore request bodies, response history, and each API's last request tab across IDE restarts. |
+| **Export Requests for Your Terminal** | Copy requests as cURL for Bash or Windows CMD, or as PowerShell commands, to reproduce API calls outside the IDE. |
 
 ## Screenshots
 
@@ -63,7 +58,7 @@ Request bodies and response history are always saved automatically, including fo
 3. Click **Install** and restart the IDE.
 
 ### Option B: Install from Disk (.zip)
-1. Download `SpringLens-1.2.6.zip` from [GitHub Releases](https://github.com/ThanhMiLa/SpringLens/releases).
+1. Download `SpringLens-1.2.7.zip` from [GitHub Releases](https://github.com/ThanhMiLa/SpringLens/releases).
 2. Go to **Settings** > **Plugins** > click the Settings icon > **Install Plugin from Disk...**.
 3. Select the downloaded `.zip` file and restart IntelliJ IDEA.
 
@@ -73,7 +68,7 @@ git clone https://github.com/ThanhMiLa/SpringLens.git
 cd SpringLens
 ./gradlew buildPlugin
 ```
-The packaged plugin will be available at `build/distributions/SpringLens-1.2.6.zip`.
+The packaged plugin will be available at `build/distributions/SpringLens-1.2.7.zip`.
 
 ## License
 

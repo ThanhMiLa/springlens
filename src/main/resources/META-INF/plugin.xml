@@ -2,7 +2,7 @@
 <idea-plugin>
     <id>com.github.thanhmila.plugin.springlens</id>
     <name>SpringLens - Spring Boot RESTful API Tester</name>
-    <version>1.2.6</version>
+    <version>1.2.7</version>
     <vendor email="vntvlogs@gmail.com" url="https://github.com/ThanhMiLa/SpringLens">ThanhMiLa</vendor>
 
     <description><![CDATA[
@@ -17,8 +17,8 @@
             <li><b>Spring Cloud Gateway Support:</b> Automatically resolves Gateway routing rules (<code>StripPrefix</code>, <code>PrefixPath</code>, <code>RewritePath</code>) and microservice context paths.</li>
             <li><b>Global Authentication Sharing:</b> Configure Bearer JWT tokens or custom auth headers once and sync them across all endpoints with a single click.</li>
             <li><b>Custom Collections & Requests:</b> Create manual requests and custom folders alongside scanned project endpoints for external API testing.</li>
-            <li><b>Dev-Friendly SSL:</b> Built-in Trust-All SSL handler for local microservices running on self-signed HTTPS certificates.</li>
-            <li><b>Workspace Persistence:</b> Automatically saves query parameters, headers, and request payloads per project across IDE restarts.</li>
+            <li><b>HTTPS Certificate Validation:</b> Validates certificates for HTTPS requests, including localhost services.</li>
+            <li><b>Workspace Persistence:</b> Automatically saves query parameters, headers, request payloads, and response history per project across IDE restarts.</li>
             <li><b>Instant cURL Export:</b> Copy formatted cURL commands instantly for terminal execution and team collaboration.</li>
         </ul>
 
@@ -39,6 +39,12 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <h3>1.2.7 — Responsive Navigation &amp; Simplified Requests</h3>
+        <ul>
+            <li><b>Responsive Endpoint Toolbar:</b> The file filter and collection, reload, and clear actions share a compact toolbar that progressively groups actions as the panel narrows.</li>
+            <li><b>Automatic Persistence:</b> Request bodies and response history are saved automatically without separate checkboxes.</li>
+            <li><b>HTTPS Validation:</b> HTTPS certificates are validated for all requests, including localhost; the insecure TLS option has been removed.</li>
+        </ul>
         <h3>1.2.6 — Preserve Null Fields in Response JSON</h3>
         <ul>
             <li><b>Preserve Null Fields:</b> Display all response fields even when their values are <code>null</code>, matching behavior with tools like Postman and preventing keys from being hidden during JSON formatting.</li>
